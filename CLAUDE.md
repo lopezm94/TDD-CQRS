@@ -62,10 +62,13 @@ assertThat(repository.findAll()).hasSize(1);
 - Acceptance tests are primary TDD driver
 
 **Test code style:**
+- **Always use `@DisplayName` annotations** to describe test cases in plain English
+- Example: `@DisplayName("Should create projection for first telemetry event")`
 - When testing multiple similar operations, define data upfront and iterate
 - Example: `List.of(events).forEach(handler::handle)` instead of multiple handler calls
 - Reduces verbosity while maintaining clarity
 - Applies to commands, events, and query setup
+- Use Given-When-Then structure with clear comments
 
 ## Development Workflow
 
@@ -97,8 +100,10 @@ Each iteration:
 4. Implement (Green)
 5. Refactor
 6. All tests pass (`./mvnw clean test`)
-7. Build jar (`./mvnw clean package -DskipTests`)
-8. **Verify docker-compose works** (`./scripts/test-docker-compose.sh`)
+7. **Verify docker-compose works** (`./scripts/test-docker-compose.sh`)
+   - Note: This script automatically runs `./mvnw clean package -DskipTests` first
+   - No need to build jar separately before running this script
+8. **Update WIP.md and TDD-PLAN.md** to reflect completed work
 9. **Get user confirmation before commit**
 10. Commit with conventional format
 11. Push to main
