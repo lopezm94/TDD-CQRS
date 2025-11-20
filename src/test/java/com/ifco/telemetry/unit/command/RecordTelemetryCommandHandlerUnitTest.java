@@ -5,7 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.ifco.telemetry.HandlerUnitTestBase;
+import com.ifco.telemetry.TestContainersBase;
+import com.ifco.telemetry.UnitTestConfiguration;
 import com.ifco.telemetry.command.RecordTelemetryCommand;
 import com.ifco.telemetry.command.RecordTelemetryCommandHandler;
 import com.ifco.telemetry.domain.Telemetry;
@@ -18,11 +19,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.context.annotation.Import;
 
 /**
  * Unit tests for RecordTelemetryCommandHandler.
@@ -30,19 +31,19 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  * Testing Strategy:
  * - Uses @SpringBootTest(classes = {...}) to whitelist only required beans
  * - @EnableAutoConfiguration loads JPA/DataSource infrastructure automatically
- * - Extends HandlerUnitTestBase to import UnitTestConfiguration (mocked EventPublisher)
+ * - @Import(UnitTestConfiguration.class) provides mocked EventPublisher and JPA config
  * - Tests only this handler's responsibility: save telemetry + publish event
  * - Does NOT test event handler behavior (that's tested separately)
  * - Uses real repository implementation (behavior testing)
  * - Verifies values passed to mocked boundaries (EventPublisher)
+ * - EventPublisher is the boundary - we don't care how it works internally
  *
- * See ADR-002 for testing strategy rationale.
+ * See TESTING-GUIDE.md for testing strategy rationale.
  */
 @SpringBootTest(classes = { RecordTelemetryCommandHandler.class })
-@EnableAutoConfiguration // Loads JPA, DataSource, Transaction infrastructure
-@EnableJpaRepositories(basePackages = "com.ifco.telemetry.repository")
-@EntityScan(basePackages = "com.ifco.telemetry.domain")
-class RecordTelemetryCommandHandlerUnitTest extends HandlerUnitTestBase {
+@EnableAutoConfiguration
+@Import(UnitTestConfiguration.class)
+class RecordTelemetryCommandHandlerUnitTest extends TestContainersBase {
 
     @Autowired
     private RecordTelemetryCommandHandler handler;
@@ -56,6 +57,7 @@ class RecordTelemetryCommandHandlerUnitTest extends HandlerUnitTestBase {
     @BeforeEach
     void clearData() {
         telemetryRepository.deleteAll();
+        Mockito.reset(eventPublisher); // Reset mock for test isolation
     }
 
     @Test
@@ -81,12 +83,11 @@ class RecordTelemetryCommandHandlerUnitTest extends HandlerUnitTestBase {
         );
 
         // And - Verify event was published (boundary interaction)
-        ArgumentCaptor<TelemetryRecordedEvent> captor = ArgumentCaptor.forClass(
-            TelemetryRecordedEvent.class
-        );
-        verify(eventPublisher).publish(captor.capture());
+        ArgumentCaptor<TelemetryRecordedEvent> eventCaptor =
+            ArgumentCaptor.forClass(TelemetryRecordedEvent.class);
+        verify(eventPublisher).publish(eventCaptor.capture());
 
-        TelemetryRecordedEvent event = captor.getValue();
+        TelemetryRecordedEvent event = eventCaptor.getValue();
         assertThat(event.deviceId()).isEqualTo(1L);
         assertThat(event.temperature()).isEqualTo(10.0);
         assertThat(event.date()).isEqualTo(

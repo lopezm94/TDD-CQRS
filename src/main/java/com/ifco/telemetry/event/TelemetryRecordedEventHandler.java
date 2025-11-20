@@ -4,10 +4,12 @@ import com.ifco.telemetry.projection.DeviceProjection;
 import com.ifco.telemetry.repository.ProjectionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 /**
  * Handles TelemetryRecordedEvent to update read projections.
+ * Consumes events from Kafka topic "telemetry.events".
  *
  * @RequiredArgsConstructor - Generates constructor with final fields for dependency injection
  * @Slf4j - Provides 'log' field for logging
@@ -19,6 +21,10 @@ public class TelemetryRecordedEventHandler {
 
     private final ProjectionRepository projectionRepository;
 
+    @KafkaListener(
+        topics = "telemetry.events",
+        groupId = "telemetry-consumer-group"
+    )
     public void handle(TelemetryRecordedEvent event) {
         var projection = projectionRepository
             .findById(event.deviceId())

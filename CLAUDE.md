@@ -5,10 +5,11 @@
 **Read these files in order:**
 1. @REQUIREMENTS.md - Code quality standards
 2. @REQUIREMENTS-EXAMPLES.md - Practical examples
-3. @WIP.md - Current progress and next steps
-4. @ADR.md - Architecture decisions with rationale
-5. @NON-GOALS.md - What we won't implement (scope boundaries)
-6. @FUTURE-IMPROVEMENTS.md - Potential enhancements (not prioritized)
+3. @TESTING-GUIDE.md - Complete testing strategy and code style
+4. @WIP.md - Current progress and next steps
+5. @ADR.md - Architecture decisions with rationale
+6. @NON-GOALS.md - What we won't implement (scope boundaries)
+7. @FUTURE-IMPROVEMENTS.md - Potential enhancements (not prioritized)
 
 ## Core Philosophy
 
@@ -43,7 +44,7 @@ Based on CQRS lab methodology with our improvements.
 
 ### Behavior Over Implementation
 
-**CRITICAL: Read @ADR.md (ADR-002) for complete testing strategy**
+**CRITICAL: Read @TESTING-GUIDE.md for complete testing strategy**
 
 **Test observable outcomes:**
 ```java
@@ -54,21 +55,18 @@ verify(repository).save(any());
 assertThat(repository.findAll()).hasSize(1);
 ```
 
-**Key principles from ADR-002:**
+**Key principles:**
 - Use real implementations, not mocks
 - Unit tests per entry point (not per class)
 - Entry points: HTTP endpoints, event consumers, command/query handlers
 - Don't unit test internal classes
 - Acceptance tests are primary TDD driver
 
-**Test code style:**
-- **Always use `@DisplayName` annotations** to describe test cases in plain English
-- Example: `@DisplayName("Should create projection for first telemetry event")`
-- When testing multiple similar operations, define data upfront and iterate
-- Example: `List.of(events).forEach(handler::handle)` instead of multiple handler calls
-- Reduces verbosity while maintaining clarity
-- Applies to commands, events, and query setup
-- Use Given-When-Then structure with clear comments
+See [TESTING-GUIDE.md](./TESTING-GUIDE.md) for:
+- Test organization and structure
+- Handler unit test configuration (bean whitelisting, mocking boundaries)
+- Repository testing strategy (TestContainers vs in-memory)
+- Test code style (Given-When-Then, @DisplayName, List.of() + forEach)
 
 ## Development Workflow
 

@@ -29,7 +29,7 @@ com.ifco.telemetry/
 
 ## Testing
 - **Behavior over implementation**: Test observable outcomes, not internals
-- **Real implementations over mocks**: Use actual beans (see ADR-002)
+- **Real implementations over mocks**: Use actual beans (see TESTING-GUIDE.md)
 - **Unit tests**: Supporting role, `@SpringBootTest` with real beans
 - **Acceptance tests**: Primary TDD driver, full flow testing
 - Structure: Given-When-Then pattern

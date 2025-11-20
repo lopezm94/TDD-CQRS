@@ -2,11 +2,12 @@ package com.ifco.telemetry.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * Publishes domain events.
- * Currently synchronous in-memory delivery. Will use Kafka for async messaging.
+ * Publishes domain events to Kafka.
+ * Events are sent to the "telemetry.events" topic for async processing.
  *
  * @RequiredArgsConstructor - Generates constructor with final fields for dependency injection
  * @Slf4j - Provides 'log' field for logging
@@ -16,17 +17,18 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class EventPublisher {
 
-    private final TelemetryRecordedEventHandler eventHandler;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    private static final String TOPIC = "telemetry.events";
 
     public void publish(TelemetryRecordedEvent event) {
         log.debug(
-            "Publishing event: deviceId={}, temperature={}, date={}",
+            "Publishing event to Kafka: deviceId={}, temperature={}, date={}",
             event.deviceId(),
             event.temperature(),
             event.date()
         );
 
-        // Synchronous event delivery for now
-        eventHandler.handle(event);
+        kafkaTemplate.send(TOPIC, event);
     }
 }

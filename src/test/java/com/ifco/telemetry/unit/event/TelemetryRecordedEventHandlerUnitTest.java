@@ -3,6 +3,7 @@ package com.ifco.telemetry.unit.event;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ifco.telemetry.TestContainersBase;
+import com.ifco.telemetry.UnitTestConfiguration;
 import com.ifco.telemetry.event.TelemetryRecordedEvent;
 import com.ifco.telemetry.event.TelemetryRecordedEventHandler;
 import com.ifco.telemetry.projection.DeviceProjection;
@@ -14,8 +15,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 @SpringBootTest
+@Import(UnitTestConfiguration.class)
 class TelemetryRecordedEventHandlerUnitTest extends TestContainersBase {
 
     @Autowired
