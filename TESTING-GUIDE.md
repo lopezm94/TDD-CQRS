@@ -30,6 +30,38 @@ assertThat(repository.findAll()).hasSize(1);
 - Full flow with all components
 - Primary TDD driver (Outside-In)
 - Test complete behaviors from entry point to outcome
+- **Do NOT use `@Transactional`** - see rationale below
+
+**Why Acceptance Tests Should NOT Use `@Transactional`:**
+
+1. **Test real behavior** - Acceptance tests should verify actual transaction boundaries, not artificial test-only transactions
+2. **No test-specific code** - Production code shouldn't be modified (e.g., adding `flush()`) just to accommodate test infrastructure
+3. **Explicit cleanup is clearer** - Use `@BeforeEach` to explicitly clean data, making test isolation obvious and predictable
+4. **Avoid Hibernate session issues** - `@Transactional` + exceptions = corrupted Hibernate session, requiring workarounds like `@DirtiesContext`
+
+**Example:**
+```java
+@SpringBootTest
+// NO @Transactional - test real transaction behavior
+class TelemetryErrorScenariosAcceptanceTest {
+    
+    @BeforeEach
+    void clearData() {
+        // Explicit cleanup for test isolation
+        telemetryRepository.deleteAll();
+        projectionRepository.deleteAll();
+    }
+    
+    @Test
+    void should_reject_invalid_input() {
+        assertThatThrownBy(() -> handler.handle(invalidCommand))
+            .isInstanceOf(IllegalArgumentException.class);
+        
+        // Can safely verify - no dirty Hibernate session
+        assertThat(repository.findAll()).isEmpty();
+    }
+}
+```
 
 **Unit Tests:**
 - Written **per entry point** (not per class)
@@ -60,6 +92,15 @@ assertThat(repository.findAll()).hasSize(1);
 - Internal classes (not entry points)
 - Implementation details already covered by acceptance tests
 - Behavior of downstream components
+- **Thin adapters** (Hexagonal Architecture plumbing - see below)
+
+**Thin Adapters (Hexagonal Architecture):**
+- Adapters with no transformation logic don't need separate unit tests
+- Examples: `@KafkaListener` that just calls handler, `@RestController` that just delegates
+- **If adapter has transformation**: Add entry point test mocking the handler
+- **If adapter is pure delegation**: Skip entry point test, covered by acceptance tests
+- Our `TelemetryRecordedEventHandler` with `@KafkaListener`: No transformation → No separate entry point test needed
+- Acceptance tests verify the full Kafka → Handler → Projection flow
 
 ---
 
@@ -241,6 +282,66 @@ void clearData() {
 
 ---
 
+## Hexagonal Architecture (Ports and Adapters)
+
+**Core concept:** Wrap external communications behind interfaces (ports), with implementations as adapters.
+
+**When to create interfaces:**
+- Communication with external systems (databases, message brokers, APIs)
+- Enables swapping implementations without breaking tests
+- Supports TDD progression: simple → complex
+
+**Examples in this codebase:**
+
+**1. ProjectionRepository (Port):**
+```java
+public interface ProjectionRepository {
+    Optional<DeviceProjection> findById(Long deviceId);
+    void save(DeviceProjection projection);
+    Iterable<DeviceProjection> findAll();
+    void deleteAll();
+}
+```
+
+**Adapters (swapped without changing tests):**
+- Iteration 1: `InMemoryProjectionRepository` (ConcurrentHashMap)
+- Iteration 4: `RedisProjectionRepository` (Redis with JSON serialization)
+
+**2. EventPublisher (Port):**
+```java
+public interface EventPublisher {
+    void publish(Object event);
+}
+```
+
+**Adapters:**
+- Iteration 1: Synchronous in-memory delivery
+- Iteration 3: Kafka-based async messaging via `KafkaTemplate`
+
+**Benefits:**
+- **Test stability**: Tests depend on interface, not implementation
+- **TDD progression**: Start simple (in-memory), evolve to production (Redis/Kafka)
+- **Implementation independence**: Business logic doesn't know about Redis/Kafka specifics
+- **Easy mocking**: Mock the port in tests, not the infrastructure
+
+**When NOT to create interfaces:**
+- Single implementation with no planned alternatives
+- Framework already provides abstraction (e.g., Spring Data repositories)
+- Over-engineering with no clear benefit (YAGNI)
+
+**Architecture layers:**
+```
+Application Core (Handlers, Domain)
+         ↓ uses
+    Ports (Interfaces)
+         ↓ implemented by
+  Adapters (Redis, Kafka, PostgreSQL)
+```
+
+**Key principle:** Domain logic depends on ports (abstractions), never directly on adapters (concrete infrastructure).
+
+---
+
 ## Summary
 
 - **Real implementations over mocks** (test behavior)
@@ -250,9 +351,11 @@ void clearData() {
 - **Mock boundaries, not repositories**
 - **Bean whitelisting for focused tests**
 - **Clear structure** (Given-When-Then, @DisplayName, List.of() + forEach)
+- **Hexagonal Architecture** for external communications (wrap in interfaces)
 
 ---
 
 ## References
 
 - [CQRS Lab](https://github.com/tpierrain/CQRS/blob/master/LabInstructions.md)
+- [Hexagonal Architecture (Alistair Cockburn)](https://alistair.cockburn.us/hexagonal-architecture/)

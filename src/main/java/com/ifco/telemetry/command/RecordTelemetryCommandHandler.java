@@ -26,6 +26,17 @@ public class RecordTelemetryCommandHandler {
 
     @Transactional
     public void handle(RecordTelemetryCommand command) {
+        // Validate inputs - fail fast with clear error messages
+        if (command.deviceId() == null) {
+            throw new IllegalArgumentException("deviceId cannot be null");
+        }
+        if (command.temperature() == null) {
+            throw new IllegalArgumentException("temperature cannot be null");
+        }
+        if (command.date() == null) {
+            throw new IllegalArgumentException("date cannot be null");
+        }
+
         // Save to write model (append-only)
         Telemetry telemetry = new Telemetry(
             command.deviceId(),

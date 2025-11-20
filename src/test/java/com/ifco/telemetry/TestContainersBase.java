@@ -1,5 +1,6 @@
 package com.ifco.telemetry;
 
+import com.redis.testcontainers.RedisContainer;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.KafkaContainer;
@@ -28,9 +29,15 @@ public abstract class TestContainersBase {
         DockerImageName.parse("confluentinc/cp-kafka:7.6.0")
     ).withReuse(true);
 
+    // Singleton Redis container shared across all tests
+    static final RedisContainer REDIS = new RedisContainer(
+        DockerImageName.parse("redis:7-alpine")
+    ).withReuse(true);
+
     static {
         POSTGRES.start();
         KAFKA.start();
+        REDIS.start();
     }
 
     @DynamicPropertySource
@@ -54,8 +61,8 @@ public abstract class TestContainersBase {
             KAFKA::getBootstrapServers
         );
 
-        // Redis configuration (using embedded Redis would be added later if needed)
-        registry.add("spring.data.redis.host", () -> "localhost");
-        registry.add("spring.data.redis.port", () -> "6379");
+        // Redis configuration
+        registry.add("spring.data.redis.host", REDIS::getHost);
+        registry.add("spring.data.redis.port", () -> REDIS.getMappedPort(6379));
     }
 }
