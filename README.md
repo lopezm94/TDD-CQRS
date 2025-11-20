@@ -17,15 +17,11 @@ A CQRS-based telemetry recording and querying service built with Spring Boot.
 
 ```bash
 ./mvnw clean test
+# Clean up testcontainers
+./scripts/kill-testcontainers.sh
 ```
 
 **Test coverage:** 32 tests (100% passing)
-
-### Cleanup Test Containers
-
-```bash
-./scripts/kill-testcontainers.sh
-```
 
 ## Running the Application
 
@@ -74,12 +70,10 @@ Queries the API every second and displays results in a live-updating table. Pres
 ## Shutdown
 
 ```bash
-# Stop all services
 docker-compose down
-
-# Stop and remove volumes (clean slate)
-docker-compose down -v
 ```
+
+Data is not persisted between runs.
 
 ## Architecture
 

@@ -7,8 +7,6 @@ services:
       POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
   kafka:
     image: confluentinc/cp-kafka:7.6.0
@@ -46,8 +44,6 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
-    volumes:
-      - redis_data:/data
 
   app:
     build:
@@ -70,7 +66,3 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-
-volumes:
-  postgres_data:
-  redis_data:
