@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: telemetry-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/telemetry
+    username: telemetry
+    password: password
+    hikari:
+      maximum-pool-size: 10
+
+  jpa:
+    hibernate:
+      ddl-auto: validate # Flyway handles schema
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+# Test profile
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/telemetry_test

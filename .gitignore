@@ -3,7 +3,8 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 
 ### Working Documentation - DO NOT COMMIT ###
-telemetry-tdd-plan.md
+TDD-PLAN.md
+WIP.md
 !**/src/main/**/target/
 !**/src/test/**/target/
 
