@@ -1,5 +1,27 @@
 # Future Improvements
 
+## Atomic Projection Updates
+- Use Redis/Valkey Lua scripts for atomic projection updates
+  - Current implementation: Read projection → Check timestamp → Write (3 operations)
+  - Improved: Single atomic Lua script handles condition checking and update
+  - Benefits:
+    - Eliminates race conditions under high concurrency
+    - Single round-trip to Redis (better performance)
+    - Guaranteed atomicity without optimistic locking
+  - Example Lua script:
+    ```lua
+    -- KEYS[1]: device projection key
+    -- ARGV[1]: new measurement, ARGV[2]: new timestamp, ARGV[3]: existing timestamp
+    local existing = redis.call('HGET', KEYS[1], 'lastUpdated')
+    if not existing or ARGV[2] >= existing then
+      redis.call('HSET', KEYS[1], 'lastMeasurement', ARGV[1], 'lastUpdated', ARGV[2])
+      return 1
+    end
+    return 0
+    ```
+  - Alternative: Use Valkey (Redis fork) with extended atomic operations
+  - Note: Current approach is good enough for most workloads; optimize only if profiling shows contention
+
 ## Null Safety
 - Migrate to Spring Boot 4 (when Java module compatibility resolved)
 - Add JSpecify + NullAway for compile-time null safety
