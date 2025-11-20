@@ -36,7 +36,7 @@ public class TelemetryRecordedEventHandler {
             event.date().isAfter(projection.getLastUpdated()) ||
             event.date().equals(projection.getLastUpdated())
         ) {
-            projection.setLastTemperature(event.temperature());
+            projection.setLastMeasurement(event.temperature());
             projection.setLastUpdated(event.date());
             projectionRepository.save(projection);
             log.debug("Updated projection for device={}", event.deviceId());

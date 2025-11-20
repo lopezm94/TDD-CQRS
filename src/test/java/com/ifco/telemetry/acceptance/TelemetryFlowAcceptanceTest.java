@@ -70,7 +70,7 @@ class TelemetryFlowAcceptanceTest extends TestContainersBase {
                 Optional<DeviceProjection> projection =
                     projectionRepository.findById(1L);
                 assertThat(projection).isPresent();
-                assertThat(projection.get().getLastTemperature()).isEqualTo(
+                assertThat(projection.get().getLastMeasurement()).isEqualTo(
                     10.0
                 );
             });
@@ -79,7 +79,7 @@ class TelemetryFlowAcceptanceTest extends TestContainersBase {
         List<DeviceTemperatureDTO> results = queryHandler.handle();
         assertThat(results).hasSize(1);
         assertThat(results.get(0).deviceId()).isEqualTo(1L);
-        assertThat(results.get(0).temperature()).isEqualTo(10.0);
+        assertThat(results.get(0).measurement()).isEqualTo(10.0);
     }
 
     @Test
@@ -156,7 +156,7 @@ class TelemetryFlowAcceptanceTest extends TestContainersBase {
                     .filter(dto -> dto.deviceId().equals(1L))
                     .findFirst()
                     .orElseThrow();
-                assertThat(device1.temperature()).isEqualTo(11.5);
+                assertThat(device1.measurement()).isEqualTo(11.5);
                 assertThat(device1.date()).isEqualTo(
                     Instant.parse("2025-01-31T13:00:10Z")
                 );
@@ -167,7 +167,7 @@ class TelemetryFlowAcceptanceTest extends TestContainersBase {
                     .filter(dto -> dto.deviceId().equals(2L))
                     .findFirst()
                     .orElseThrow();
-                assertThat(device2.temperature()).isEqualTo(9.5);
+                assertThat(device2.measurement()).isEqualTo(9.5);
                 assertThat(device2.date()).isEqualTo(
                     Instant.parse("2025-01-31T13:00:16Z")
                 );
@@ -178,7 +178,7 @@ class TelemetryFlowAcceptanceTest extends TestContainersBase {
                     .filter(dto -> dto.deviceId().equals(3L))
                     .findFirst()
                     .orElseThrow();
-                assertThat(device3.temperature()).isEqualTo(16.0);
+                assertThat(device3.measurement()).isEqualTo(16.0);
                 assertThat(device3.date()).isEqualTo(
                     Instant.parse("2025-01-31T13:00:07Z")
                 );
@@ -269,7 +269,7 @@ class TelemetryFlowAcceptanceTest extends TestContainersBase {
                     .filter(dto -> dto.deviceId().equals(1L))
                     .findFirst()
                     .orElseThrow();
-                assertThat(device1.temperature()).isEqualTo(20.0);
+                assertThat(device1.measurement()).isEqualTo(20.0);
                 assertThat(device1.date()).isEqualTo(
                     Instant.parse("2025-01-31T13:00:20Z")
                 );
@@ -280,7 +280,7 @@ class TelemetryFlowAcceptanceTest extends TestContainersBase {
                     .filter(dto -> dto.deviceId().equals(2L))
                     .findFirst()
                     .orElseThrow();
-                assertThat(device2.temperature()).isEqualTo(12.0);
+                assertThat(device2.measurement()).isEqualTo(12.0);
                 assertThat(device2.date()).isEqualTo(
                     Instant.parse("2025-01-31T13:00:05Z")
                 );
@@ -291,7 +291,7 @@ class TelemetryFlowAcceptanceTest extends TestContainersBase {
                     .filter(dto -> dto.deviceId().equals(3L))
                     .findFirst()
                     .orElseThrow();
-                assertThat(device3.temperature()).isEqualTo(20.0);
+                assertThat(device3.measurement()).isEqualTo(20.0);
                 assertThat(device3.date()).isEqualTo(
                     Instant.parse("2025-01-31T13:00:05Z")
                 );

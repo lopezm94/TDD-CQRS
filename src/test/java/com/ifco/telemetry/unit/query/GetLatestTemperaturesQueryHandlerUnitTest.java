@@ -60,7 +60,7 @@ class GetLatestTemperaturesQueryHandlerUnitTest extends TestContainersBase {
             .filter(dto -> dto.deviceId().equals(1L))
             .findFirst()
             .orElseThrow();
-        assertThat(device1.temperature()).isEqualTo(12.0);
+        assertThat(device1.measurement()).isEqualTo(12.0);
         assertThat(device1.date()).isEqualTo(
             Instant.parse("2025-01-31T13:00:05Z")
         );
@@ -70,7 +70,7 @@ class GetLatestTemperaturesQueryHandlerUnitTest extends TestContainersBase {
             .filter(dto -> dto.deviceId().equals(2L))
             .findFirst()
             .orElseThrow();
-        assertThat(device2.temperature()).isEqualTo(10.0);
+        assertThat(device2.measurement()).isEqualTo(10.0);
         assertThat(device2.date()).isEqualTo(
             Instant.parse("2025-01-31T13:00:11Z")
         );
@@ -106,7 +106,7 @@ class GetLatestTemperaturesQueryHandlerUnitTest extends TestContainersBase {
         // Then
         assertThat(results).hasSize(1);
         assertThat(results.get(0).deviceId()).isEqualTo(1L);
-        assertThat(results.get(0).temperature()).isEqualTo(15.5);
+        assertThat(results.get(0).measurement()).isEqualTo(15.5);
         assertThat(results.get(0).date()).isEqualTo(
             Instant.parse("2025-01-31T14:30:00Z")
         );

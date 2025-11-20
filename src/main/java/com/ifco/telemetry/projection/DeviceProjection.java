@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Projection for device's latest temperature reading.
+ * Projection for device's latest measurement reading.
  *
  * Uses regular class (not record) because:
  * - Needs to be mutable (updated when new events arrive)
@@ -23,6 +23,6 @@ import lombok.NoArgsConstructor;
 public class DeviceProjection {
 
     private Long deviceId;
-    private Double lastTemperature;
+    private Double lastMeasurement;
     private Instant lastUpdated;
 }

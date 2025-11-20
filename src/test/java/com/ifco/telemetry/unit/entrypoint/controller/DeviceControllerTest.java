@@ -55,10 +55,10 @@ class DeviceControllerTest {
             .perform(get("/devices/temperatures"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].deviceId").value(1))
-            .andExpect(jsonPath("$[0].temperature").value(12.0))
+            .andExpect(jsonPath("$[0].measurement").value(12.0))
             .andExpect(jsonPath("$[0].date").value("2025-01-31T13:00:05Z"))
             .andExpect(jsonPath("$[1].deviceId").value(2))
-            .andExpect(jsonPath("$[1].temperature").value(10.0))
+            .andExpect(jsonPath("$[1].measurement").value(10.0))
             .andExpect(jsonPath("$[1].date").value("2025-01-31T13:00:11Z"));
 
         verify(queryHandler).handle();

@@ -1,11 +1,10 @@
 package com.ifco.telemetry.query;
 
 import com.ifco.telemetry.repository.ProjectionRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 /**
  * Returns latest temperature reading for all devices.
@@ -21,13 +20,17 @@ public class GetLatestTemperaturesQueryHandler {
     public List<DeviceTemperatureDTO> handle() {
         List<DeviceTemperatureDTO> results = new ArrayList<>();
 
-        projectionRepository.findAll().forEach(projection ->
-                results.add(new DeviceTemperatureDTO(
+        projectionRepository
+            .findAll()
+            .forEach(projection ->
+                results.add(
+                    new DeviceTemperatureDTO(
                         projection.getDeviceId(),
-                        projection.getLastTemperature(),
+                        projection.getLastMeasurement(),
                         projection.getLastUpdated()
-                ))
-        );
+                    )
+                )
+            );
 
         return results;
     }

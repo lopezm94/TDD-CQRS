@@ -51,7 +51,7 @@ class TelemetryRecordedEventHandlerUnitTest extends TestContainersBase {
         );
         assertThat(projection).isPresent();
         assertThat(projection.get().getDeviceId()).isEqualTo(1L);
-        assertThat(projection.get().getLastTemperature()).isEqualTo(10.0);
+        assertThat(projection.get().getLastMeasurement()).isEqualTo(10.0);
         assertThat(projection.get().getLastUpdated()).isEqualTo(
             Instant.parse("2025-01-31T13:00:00Z")
         );
@@ -81,7 +81,7 @@ class TelemetryRecordedEventHandlerUnitTest extends TestContainersBase {
             1L
         );
         assertThat(projection).isPresent();
-        assertThat(projection.get().getLastTemperature()).isEqualTo(12.0);
+        assertThat(projection.get().getLastMeasurement()).isEqualTo(12.0);
         assertThat(projection.get().getLastUpdated()).isEqualTo(
             Instant.parse("2025-01-31T13:00:05Z")
         );
@@ -113,7 +113,7 @@ class TelemetryRecordedEventHandlerUnitTest extends TestContainersBase {
             1L
         );
         assertThat(projection).isPresent();
-        assertThat(projection.get().getLastTemperature()).isEqualTo(12.0);
+        assertThat(projection.get().getLastMeasurement()).isEqualTo(12.0);
         assertThat(projection.get().getLastUpdated()).isEqualTo(
             Instant.parse("2025-01-31T13:00:05Z")
         );
@@ -143,7 +143,7 @@ class TelemetryRecordedEventHandlerUnitTest extends TestContainersBase {
             1L
         );
         assertThat(projection).isPresent();
-        assertThat(projection.get().getLastTemperature()).isEqualTo(10.0);
+        assertThat(projection.get().getLastMeasurement()).isEqualTo(10.0);
         assertThat(projection.get().getLastUpdated()).isEqualTo(
             Instant.parse("2025-01-31T13:00:00Z")
         );
@@ -173,7 +173,7 @@ class TelemetryRecordedEventHandlerUnitTest extends TestContainersBase {
             1L
         );
         assertThat(projection).isPresent();
-        assertThat(projection.get().getLastTemperature()).isEqualTo(15.0);
+        assertThat(projection.get().getLastMeasurement()).isEqualTo(15.0);
         assertThat(projection.get().getLastUpdated()).isEqualTo(
             Instant.parse("2025-01-31T13:00:00Z")
         );
@@ -212,7 +212,7 @@ class TelemetryRecordedEventHandlerUnitTest extends TestContainersBase {
         // Then - Final state should be the latest
         Optional<DeviceProjection> result = projectionRepository.findById(1L);
         assertThat(result).isPresent();
-        assertThat(result.get().getLastTemperature()).isEqualTo(13.0);
+        assertThat(result.get().getLastMeasurement()).isEqualTo(13.0);
         assertThat(result.get().getLastUpdated()).isEqualTo(
             Instant.parse("2025-01-31T13:00:03Z")
         );
@@ -256,7 +256,7 @@ class TelemetryRecordedEventHandlerUnitTest extends TestContainersBase {
         // Then - Should keep the chronologically latest
         Optional<DeviceProjection> result = projectionRepository.findById(1L);
         assertThat(result).isPresent();
-        assertThat(result.get().getLastTemperature()).isEqualTo(20.0);
+        assertThat(result.get().getLastMeasurement()).isEqualTo(20.0);
         assertThat(result.get().getLastUpdated()).isEqualTo(
             Instant.parse("2025-01-31T13:00:10Z")
         );
